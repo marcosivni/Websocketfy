@@ -51,7 +51,7 @@ Figure 1. Getting QT SDK 5 on Debian-based systems.
 > Alternatively, you can install Qt Web Sockets module by using the package manager of your Linux operating system, as in the Debian-based command below. Please, be aware of checking for deprecated packages.
 
 ```console
-# apt-get -f install libqt5websockets5
+# apt-get -f install libqt5websockets5-dev
 ```
 
 ### Bringing the pieces together
@@ -97,9 +97,6 @@ $ mkdir bin
 $ mv websocketfy/WS-Server bin/WS-Server
 ```
 
-![Directory structure after the compilation.](https://github.com/marcosivni/siren/blob/main/example/InstallQt-P4.png)
-Figure 2. Directory structure after the compilation.
-
 ### Running the Websocketfy Server
 
 The Websocketfy Server binary requires a set of arguments, namely:
@@ -118,10 +115,10 @@ A call for the Websocketfy Server (binary `WS-Binary`) running in localhost on s
 
 > **NOTE:** We assume SIREN Server is also running on localhost port 3434 - [Example](https://github.com/marcosivni/siren/wiki/Server-Setup).
 
-Figure 3 presents the expected output for a valid  Websocketfy Server setup, expecting incoming connections in a `while(true)` loop.
+Figure 2 presents the expected output for a valid  Websocketfy Server setup, expecting incoming connections in a `while(true)` loop.
 
 ![Running Websocketfy Server.](https://github.com/marcosivni/siren/blob/main/example/InstallQt-P8.png)
-Figure 3. Running  Websocketfy Server.
+Figure 2. Running  Websocketfy Server.
 
 
 ### Connecting to the Server
