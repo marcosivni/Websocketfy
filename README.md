@@ -117,7 +117,7 @@ A call for the Websocketfy Server (binary `WS-Binary`) running in localhost on s
 
 Figure 2 presents the expected output for a valid  Websocketfy Server setup, expecting incoming connections in a `while(true)` loop.
 
-![Running Websocketfy Server.](https://github.com/marcosivni/siren/blob/main/example/InstallQt-P8.png)
+![Running Websocketfy Server.](https://github.com/marcosivni/websocketfy/blob/main/imgs/WS1.png)
 Figure 2. Running  Websocketfy Server.
 
 
