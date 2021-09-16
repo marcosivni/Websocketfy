@@ -109,7 +109,7 @@ void ConnectServer::processBinaryMessage(QByteArray message){
     if (tokens.first().toUpper() == "REQUEST"){
 
         if (tokens.size() > 1){
-            QFile *file = new QFile("tmp/" + tokens.at(1));
+            QFile *file = new QFile("fs/" + tokens.at(1));
             std::cout << "Requested file: " + tokens.at(1).toStdString() << std::endl;
             if(file->open(QFile::ReadOnly)){
                 answer = file->readAll();
