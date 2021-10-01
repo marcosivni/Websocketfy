@@ -153,7 +153,7 @@ void ConnectServer::processBinaryMessage(QByteArray message){
                 //Fetch answer (synchronous and blocking way)]
                 tcpSocket->waitForReadyRead(-1);
 
-                //Workaround loop for larger messages - Complete fix require implementing an application protocol
+                //Workaround loop for larger messages - Complete fix requires implementing an application protocol
                 //[#This issue related to the OS limits for the buffer size of tcp scokets - client side]
                 //[#The server sends data with a single write, but multiple reads are required on the client side]
                 while (tcpSocket->bytesAvailable() && (input.size() || !buffer.size())){
