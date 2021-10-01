@@ -100,7 +100,7 @@ void ConnectServer::processBinaryMessage(QByteArray message){
 
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     QString input = message;
-    QByteArray answer;
+    QByteArray answer, buffer;
     QStringList tokens = input.split(" ");
 
     std::cout << "New request received: " << message.toStdString() << std::endl;
@@ -152,17 +152,29 @@ void ConnectServer::processBinaryMessage(QByteArray message){
 
                 //Fetch answer (synchronous and blocking way)]
                 tcpSocket->waitForReadyRead(-1);
-                tcpSocket->bytesAvailable();
-                answer = tcpSocket->readAll();
 
-                if (answer.toStdString().empty()){
-                    std::cout << "[WARNING]: Empty result set!" << std::endl;
+                //Workaround loop for larger messages - Complete fix require implementing an application protocol
+                //[#This issue related to the OS limits for the buffer size of tcp scokets - client side]
+                //[#The server sends data with a single write, but multiple reads are required on the client side]
+                while (tcpSocket->bytesAvailable() && (input.size() || !buffer.size())){
+                    buffer = tcpSocket->readAll();
+                    if (buffer.toStdString().empty()){
+                        std::cout << "[WARNING]: Empty result set!" << std::endl;
+                    }
+                    input = buffer;
+
+                    //Remove markers
+                    input.replace("Siren::SQL> ", "");
+                    if (input != "\n"){
+                        answer = answer + input.toLocal8Bit();
+                    } else {
+                        input.clear();
+                    }
+
+                    tcpSocket->write("\n");
+                    tcpSocket->waitForBytesWritten(-1);
+                    tcpSocket->waitForReadyRead(-1);
                 }
-                input = answer;
-
-                //Remove markers
-                input.replace("Siren::SQL> ", "");
-                answer = input.toStdString().c_str();
 
                 tcpSocket->close();
                 delete (tcpSocket);
