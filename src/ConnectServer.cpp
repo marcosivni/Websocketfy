@@ -100,12 +100,12 @@ void ConnectServer::processBinaryMessage(QByteArray message){
 
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     QString input = message;
-    QByteArray answer;
+    QByteArray answer, buffer;
     QStringList tokens = input.split(" ");
 
     std::cout << "New request received: " << message.toStdString() << std::endl;
 
-    //FTP-like task
+    //FTP-duty task
     if (tokens.first().toUpper() == "REQUEST"){
 
         if (tokens.size() > 1){
@@ -131,29 +131,56 @@ void ConnectServer::processBinaryMessage(QByteArray message){
                 pClient->deleteLater();
             }
         } else {
-            //WebSocket <-> TCP Tunnel start
+            //WebSocket <-> TCP Tunnel activation
             tcpSocket = new QTcpSocket(this);
             tcpSocket->connectToHost(sirenAddress, sirenPort);
+            //Skip markers
+            tcpSocket->waitForReadyRead(-1);
+            tcpSocket->bytesAvailable();
 
             if (!tcpSocket->isOpen()){
                 std::cout << "Fatal error. Siren Server not avaliable!" << std::endl;
                 return;
             } else {
+                //Send command (synchronous and blocking way)
+                std::cout << "Sending TCP request. Please wait..." << std::endl;
 
-                //Sending data.... Blocking call ...
-                stp.send(tcpSocket, input.toUtf8());
+                tcpSocket->write(input.toStdString().c_str());
+                tcpSocket->waitForBytesWritten(-1);
 
                 std::cout << "Waiting TCP reply. Please wait..." << std::endl;
 
-                input = stp.receive(tcpSocket);
-                answer = input.toUtf8();
+                //Fetch answer (synchronous and blocking way)]
+                tcpSocket->waitForReadyRead(-1);
 
-                //Receiving data.... Blocking call ...
+                //Workaround loop for larger messages - Complete fix requires implementing an application protocol
+                //[#This issue related to the OS limits for the buffer size of tcp scokets - client side]
+                //[#The server sends data with a single write, but multiple reads are required on the client side]
+                while (tcpSocket->bytesAvailable() && (input.size() || !buffer.size())){
+                    buffer = tcpSocket->readAll();
+                    if (buffer.toStdString().empty()){
+                        std::cout << "[WARNING]: Empty result set!" << std::endl;
+                    }
+                    input = buffer;
+
+                    //Remove markers
+                    input.replace("Siren::SQL> ", "");
+                    if (input != "\n"){
+                        answer = answer + input.toLocal8Bit();
+                    } else {
+                        input.clear();
+                    }
+
+                    tcpSocket->write("\n");
+                    tcpSocket->waitForBytesWritten(-1);
+                    tcpSocket->waitForReadyRead(-1);
+                }
+
                 tcpSocket->close();
                 delete (tcpSocket);
                 tcpSocket = nullptr;
             }
-            //Tunnel end
+            //Tunnel ending
         }
     }
     std::cout << "WebSocketfy reply size: " << answer.size() << std::endl;
