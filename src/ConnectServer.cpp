@@ -131,7 +131,7 @@ void ConnectServer::processBinaryMessage(QByteArray message){
                 pClient->deleteLater();
             }
         } else {
-            //WebSocket <-> TCP Tunnel activation
+            //WebSocket <-> TCP Tunnel start
             tcpSocket = new QTcpSocket(this);
             tcpSocket->connectToHost(sirenAddress, sirenPort);
             //Skip markers
@@ -145,7 +145,9 @@ void ConnectServer::processBinaryMessage(QByteArray message){
                 //Send command (synchronous and blocking way)
                 std::cout << "Sending TCP request. Please wait..." << std::endl;
 
-                tcpSocket->write(input.toStdString().c_str());
+                tcpSocket->write(QString::number(input.toUtf8().toLong()).toUtf8());
+                tcpSocket->waitForBytesWritten(-1);
+                tcpSocket->write(input.toUtf8());
                 tcpSocket->waitForBytesWritten(-1);
 
                 std::cout << "Waiting TCP reply. Please wait..." << std::endl;
@@ -153,27 +155,22 @@ void ConnectServer::processBinaryMessage(QByteArray message){
                 //Fetch answer (synchronous and blocking way)]
                 tcpSocket->waitForReadyRead(-1);
 
-                //Workaround loop for larger messages - Complete fix requires implementing an application protocol
-                //[#This issue related to the OS limits for the buffer size of tcp scokets - client side]
-                //[#The server sends data with a single write, but multiple reads are required on the client side]
-                while (tcpSocket->bytesAvailable() && (input.size() || !buffer.size())){
-                    buffer = tcpSocket->readAll();
-                    if (buffer.toStdString().empty()){
-                        std::cout << "[WARNING]: Empty result set!" << std::endl;
-                    }
-                    input = buffer;
+                long sizeM = QString(tcpSocket->readAll()).toLong();
 
-                    //Remove markers
-                    input.replace("Siren::SQL> ", "");
-                    if (input != "\n"){
-                        answer = answer + input.toLocal8Bit();
-                    } else {
-                        input.clear();
-                    }
-
-                    tcpSocket->write("\n");
-                    tcpSocket->waitForBytesWritten(-1);
+                while (sizeM > 0){
                     tcpSocket->waitForReadyRead(-1);
+                    QByteArray buff = tcpSocket->readAll();
+                    input += QString::fromUtf8(buff);
+                    sizeM -= buff.size();
+
+                }
+
+                //Remove markers
+                input.replace("Siren::SQL> ", "");
+                if (input != "\n"){
+                    answer = answer + input.toUtf8();
+                } else {
+                    input.clear();
                 }
 
                 tcpSocket->close();
