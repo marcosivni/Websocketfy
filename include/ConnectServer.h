@@ -50,6 +50,8 @@
 #ifndef ConnectServer_H
 #define ConnectServer_H
 
+#include <SirenTransferProtocol.h>
+
 #include <QObject>
 #include <QList>
 #include <QByteArray>
@@ -67,9 +69,18 @@
 class ConnectServer : public QObject
 {
     Q_OBJECT
-public:
-    explicit ConnectServer(quint16 port, QHostAddress address, QHostAddress sirenAddress, quint16 sirenPort, QObject *parent = nullptr);
-    ~ConnectServer();
+
+    private:
+        QWebSocketServer *m_pWebSocketServer;
+        QList<QWebSocket *> m_clients;
+        QHostAddress sirenAddress;
+        quint16 sirenPort;
+        QTcpSocket* tcpSocket;
+        SirenTransferProtocol stp;
+
+    public:
+        explicit ConnectServer(quint16 port, QHostAddress address, QHostAddress sirenAddress, quint16 sirenPort, QObject *parent = nullptr);
+        ~ConnectServer();
 
     Q_SIGNALS:
         void closed();
@@ -79,12 +90,7 @@ public:
         void processBinaryMessage(QByteArray message);
         void socketDisconnected();
 
-    private:
-        QWebSocketServer *m_pWebSocketServer;
-        QList<QWebSocket *> m_clients;
-        QHostAddress sirenAddress;
-        quint16 sirenPort;
-        QTcpSocket* tcpSocket;
+
 };
 
 #endif //ConnectServer_H
