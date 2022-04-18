@@ -15,7 +15,7 @@ However, WebAssembly *does not* offer direct support for TCP connections due to 
 
 Accordingly, the ~~workaround~~ solution we can use is "websocketfy" the communication between the client and those servers, which means using an *application-layer* protocol named [WebSocket](https://datatracker.ietf.org/doc/html/rfc6455) to establish a connection and exchange control messages with *another* application-layer protocol. 
 
-Qt SDK with Emscripten offers support for WebSocket through [QWebSocket](https://doc.qt.io/qt-5/qwebsocket.html), which we used in in this repository (Qt SDK 5.15.1 - LGPL-license, Emscripten with em++ compiler v2.0.22). In addition to the tunneling of extended SQL commands to SIREN, we implemented a basic (download-only) transferring file functionality rather than a second tunnel to an FTP Server within our Websocketfy-Server. Such functionality is available by using the reserved word `REQUEST` within an application message (See [here](www) for an example).
+Qt SDK with Emscripten offers support for WebSocket through [QWebSocket](https://doc.qt.io/qt-5/qwebsocket.html), which we used in in this repository (Qt SDK 5.15.1 - LGPL-license, Emscripten with em++ compiler v2.0.22). In addition to the tunneling of extended SQL commands to SIREN, we implemented a basic (download-only) transferring file functionality rather than a second tunnel to an FTP Server within our Websocketfy-Server. Such functionality is available by using the reserved word `REQUEST` within an application message.
 
 > **NOTE:** Security-driven protocols (*e.g.,* SSL, TLS, etc.) are currently [not fully supported](https://webassembly.org/docs/security/) by WebAssembly. They are expected to be implemented in the near future.
 
