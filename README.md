@@ -1,4 +1,4 @@
-# Websocketfy Project for Higiia
+# Websocketfy Project for WebHigiia
 
 ## Tunneling for extended SQL and filesystem access
 
@@ -11,7 +11,7 @@ One may argue [SiREN](https://github.com/marcosivni/siren) and [FTP](https://sec
 
 Notice they both execute application protocols based on reliable TCP connections in the transport layer of the TCP/IP network model, so the client-side of those servers must support TCP sockets for opening and maintaining network connections.
 This is no problem for clients that rely on the operating system API for establishing TCP connections, such as Phyton scripts, Java-based/PHP web servers, or C++ desktop applications (running [QTCPSocket](https://doc.qt.io/qt-5/qtcpsocket.html), for instance). 
-However, WebAssembly *does not* offer direct support for TCP connections due to ~~some [odd reasons](https://github.com/bytecodealliance/wasmtime/issues/70)~~ its sandbox design. In particular, no standard support for that issue is provided by the QT SDK (See [here](https://bugreports.qt.io/browse/QTBUG-63920)), which is the platform where Higiia is coded.
+However, WebAssembly *does not* offer direct support for TCP connections due to ~~some [odd reasons](https://github.com/bytecodealliance/wasmtime/issues/70)~~ its sandbox design. In particular, no standard support for that issue is provided by the QT SDK (See [here](https://bugreports.qt.io/browse/QTBUG-63920)), which is the platform where WebHigiia is coded.
 
 Accordingly, the ~~workaround~~ solution we can use is "websocketfy" the communication between the client and those servers, which means using an *application-layer* protocol named [WebSocket](https://datatracker.ietf.org/doc/html/rfc6455) to establish a connection and exchange control messages with *another* application-layer protocol. 
 
@@ -21,7 +21,7 @@ Qt SDK with Emscripten offers support for WebSocket through [QWebSocket](https:/
 
 ## Client-Server architecture with the Websocketfy-Server
 
-The Websocketfy-Server is a middle piece between the Higiia client and the extended SQL server. Since the client typically requests large image files, we opt to keep those files organized in an external filesystem (shared with PACS environments) accessible to the Websocketfy-Server to shorten transferring distances and reduce overhead in this client-server architecture. Accordingly, the Websocketfy-Server is also responsible for conveying the files to the client, unburdening the SIREN server. Figure 1 summarizes the relationships between the Higiia client and the data servers.
+The Websocketfy-Server is a middle piece between the WebHigiia client and the extended SQL server. Since the client typically requests large image files, we opt to keep those files organized in an external filesystem (shared with PACS environments) accessible to the Websocketfy-Server to shorten transferring distances and reduce overhead in this client-server architecture. Accordingly, the Websocketfy-Server is also responsible for conveying the files to the client, unburdening the SIREN server. Figure 1 summarizes the relationships between the Higiia client and the data servers.
 
 ![Higiia relationships](https://github.com/marcosivni/higiia/blob/main/model/example/imgs/architecture.png)
 Figure 1. Relationships between the Higiia client and data servers.
@@ -131,7 +131,7 @@ Figure 2. Running  Websocketfy-Server.
 
 ### Connecting to the Server
 
-Connecting with the WebSocket Server requires a WebSocket client request (`ws` protocol prefix and a [proper header](https://datatracker.ietf.org/doc/html/rfc6455#section-1.3)).  It can be accomplished with a QWebSocket object connected on a valid hostname and port. This step is performed before the login procedure by [Higiia](https://github.com/marcosivni/higiia).
+Connecting with the WebSocket Server requires a WebSocket client request (`ws` protocol prefix and a [proper header](https://datatracker.ietf.org/doc/html/rfc6455#section-1.3)).  It can be accomplished with a QWebSocket object connected on a valid hostname and port. This step is performed before the login procedure by [WebHigiia](https://github.com/marcosivni/Webhigiia).
 
 
 ### Example - Messages
